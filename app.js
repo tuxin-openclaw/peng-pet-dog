@@ -1499,29 +1499,39 @@
     ctx.restore();
   }
 
-  function drawDaisyEar(side, kick) {
-    const style = getCharStyle();
-    ctx.save();
-    ctx.translate(side * 68, -56);
-    ctx.rotate(side * (0.24 + kick * 0.14));
-
-    // Plush pointed-rounded Shiba ear sitting naturally on the round head
+  function defineDaisyEarPath(side) {
     ctx.beginPath();
     ctx.moveTo(side * -30, 22);
     ctx.bezierCurveTo(side * -26, -34, side * 0, -72, side * 22, -64);
     ctx.bezierCurveTo(side * 44, -54, side * 46, 4, side * 30, 40);
     ctx.closePath();
+  }
 
+  function drawDaisyEarStroke(side, kick) {
+    const style = getCharStyle();
+    ctx.save();
+    ctx.translate(side * 68, -56);
+    ctx.rotate(side * (0.24 + kick * 0.14));
+    defineDaisyEarPath(side);
+    ctx.strokeStyle = style.outline;
+    ctx.lineWidth = style.outlineW * 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawDaisyEarFill(side, kick) {
+    ctx.save();
+    ctx.translate(side * 68, -56);
+    ctx.rotate(side * (0.24 + kick * 0.14));
+
+    defineDaisyEarPath(side);
     const eGrad = ctx.createLinearGradient(0, -64, 0, 34);
     eGrad.addColorStop(0, '#FCE08A');
     eGrad.addColorStop(0.55, '#F8C65C');
     eGrad.addColorStop(1, '#EAA93D');
     ctx.fillStyle = eGrad;
     ctx.fill();
-    ctx.strokeStyle = style.outline;
-    ctx.lineWidth = style.outlineW;
-    ctx.lineJoin = 'round';
-    ctx.stroke();
 
     // Milky white inner fur rim
     ctx.beginPath();
@@ -1556,13 +1566,13 @@
   }
 
   function defineDaisyHeadPath() {
-    // Super round, plump, smooth circular mochi Shiba head (圆滚滚的圆脸!)
+    // Super round, 100% G1-continuous circular mochi Shiba head (圆滚滚的连贯圆脸!)
     ctx.beginPath();
     ctx.moveTo(0, -90);
-    ctx.bezierCurveTo(64, -90, 110, -48, 111, 4);
-    ctx.bezierCurveTo(112, 58, 66, 96, 0, 96);
-    ctx.bezierCurveTo(-66, 96, -112, 58, -111, 4);
-    ctx.bezierCurveTo(-110, -48, -64, -90, 0, -90);
+    ctx.bezierCurveTo(64, -90, 111, -48, 111, 4);
+    ctx.bezierCurveTo(111, 58, 66, 96, 0, 96);
+    ctx.bezierCurveTo(-66, 96, -111, 58, -111, 4);
+    ctx.bezierCurveTo(-111, -48, -64, -90, 0, -90);
     ctx.closePath();
   }
 
@@ -1731,13 +1741,23 @@
     // 4. Signature blue daisy bandana cradling the round chin!
     drawBlueDaisyBandana(bodyX, 278 + breath * 0.75, state.dogLeanX);
 
-    // 5. Big round joyful smiling Shiba head!
+    // 5. Big round joyful smiling Shiba head with 100% seamless continuous Ear + Head contour!
     ctx.save();
     ctx.translate(headX, headY);
     ctx.rotate(headTilt);
 
-    drawDaisyEar(-1, state.leftEarKick);
-    drawDaisyEar(1, state.rightEarKick);
+    // Pass 1: Unified outer stroke for ears + G1-smooth round head (zero seam at ear bases!)
+    drawDaisyEarStroke(-1, state.leftEarKick);
+    drawDaisyEarStroke(1, state.rightEarKick);
+    defineDaisyHeadPath();
+    ctx.strokeStyle = style.outline;
+    ctx.lineWidth = style.outlineW * 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Pass 2: Seamless interior fills
+    drawDaisyEarFill(-1, state.leftEarKick);
+    drawDaisyEarFill(1, state.rightEarKick);
 
     defineDaisyHeadPath();
     const headGrad = ctx.createRadialGradient(-22, -52, 16, 0, 0, 134);
@@ -1747,20 +1767,18 @@
     ctx.fillStyle = headGrad;
     ctx.fill();
 
-    // Wide milky-white Shiba face (白面!) gracefully following the round face
+    // Wide milky-white Shiba face (白面!) smoothly sweeping across round cheeks
     ctx.save();
     defineDaisyHeadPath();
     ctx.clip();
 
     ctx.beginPath();
     ctx.moveTo(0, -18);
-    ctx.bezierCurveTo(22, -40, 68, -36, 92, -6);
-    ctx.bezierCurveTo(116, 20, 122, 52, 118, 92);
-    ctx.lineTo(118, 112);
-    ctx.lineTo(-118, 112);
-    ctx.lineTo(-118, 92);
-    ctx.bezierCurveTo(-122, 52, -116, 20, -92, -6);
-    ctx.bezierCurveTo(-68, -36, -22, -40, 0, -18);
+    ctx.bezierCurveTo(22, -40, 72, -38, 118, 10);
+    ctx.lineTo(120, 112);
+    ctx.lineTo(-120, 112);
+    ctx.lineTo(-118, 10);
+    ctx.bezierCurveTo(-72, -38, -22, -40, 0, -18);
     ctx.closePath();
 
     const faceGrad = ctx.createLinearGradient(0, -34, 0, 96);
@@ -1780,12 +1798,6 @@
     ctx.fill();
 
     ctx.restore(); // end head clip
-
-    defineDaisyHeadPath();
-    ctx.strokeStyle = style.outline;
-    ctx.lineWidth = style.outlineW;
-    ctx.lineJoin = 'round';
-    ctx.stroke();
 
     drawDaisyFaceFeatures();
     ctx.restore();
@@ -1840,28 +1852,39 @@
     ctx.restore();
   }
 
-  function drawShibaEar(side, kick) {
-    const style = getCharStyle();
-    ctx.save();
-    ctx.translate(side * 68, -52);
-    ctx.rotate(side * (0.28 + kick * 0.15));
-
+  function defineShibaEarPath(side) {
     ctx.beginPath();
     ctx.moveTo(side * -30, 20);
     ctx.bezierCurveTo(side * -24, -26, side * 2, -60, side * 24, -52);
     ctx.bezierCurveTo(side * 46, -42, side * 46, 6, side * 30, 38);
     ctx.closePath();
+  }
 
+  function drawShibaEarStroke(side, kick) {
+    const style = getCharStyle();
+    ctx.save();
+    ctx.translate(side * 68, -52);
+    ctx.rotate(side * (0.28 + kick * 0.15));
+    defineShibaEarPath(side);
+    ctx.strokeStyle = style.outline;
+    ctx.lineWidth = style.outlineW * 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawShibaEarFill(side, kick) {
+    ctx.save();
+    ctx.translate(side * 68, -52);
+    ctx.rotate(side * (0.28 + kick * 0.15));
+
+    defineShibaEarPath(side);
     const earGrad = ctx.createLinearGradient(0, -56, 0, 30);
     earGrad.addColorStop(0, '#FBC86C');
     earGrad.addColorStop(0.6, '#F2AA42');
     earGrad.addColorStop(1, '#DE8C26');
     ctx.fillStyle = earGrad;
     ctx.fill();
-    ctx.strokeStyle = style.outline;
-    ctx.lineWidth = style.outlineW;
-    ctx.lineJoin = 'round';
-    ctx.stroke();
 
     ctx.beginPath();
     ctx.moveTo(side * -12, 16);
@@ -1896,13 +1919,13 @@
   }
 
   function defineMochiHeadPath() {
-    // Super round, smooth circular mochi Shiba head (圆滚滚的圆脸!)
+    // Super round, 100% G1-continuous circular mochi Shiba head (圆滚滚的连贯圆脸!)
     ctx.beginPath();
     ctx.moveTo(0, -90);
-    ctx.bezierCurveTo(64, -90, 110, -48, 111, 4);
-    ctx.bezierCurveTo(112, 58, 66, 95, 0, 95);
-    ctx.bezierCurveTo(-66, 95, -112, 58, -111, 4);
-    ctx.bezierCurveTo(-110, -48, -64, -90, 0, -90);
+    ctx.bezierCurveTo(64, -90, 111, -48, 111, 4);
+    ctx.bezierCurveTo(111, 58, 66, 95, 0, 95);
+    ctx.bezierCurveTo(-66, 95, -111, 58, -111, 4);
+    ctx.bezierCurveTo(-111, -48, -64, -90, 0, -90);
     ctx.closePath();
   }
 
@@ -2050,8 +2073,35 @@
     ctx.translate(headX, headY);
     ctx.rotate(headTilt);
 
-    drawShibaEar(-1, state.leftEarKick);
-    drawShibaEar(1, state.rightEarKick);
+    const defineHairTuftPath = () => {
+      ctx.beginPath();
+      ctx.moveTo(-6, -89);
+      ctx.quadraticCurveTo(-2, -103, 9, -98);
+      ctx.quadraticCurveTo(4, -91, 8, -89);
+      ctx.closePath();
+    };
+
+    // Pass 1: Unified outer stroke for ears + hair tuft + G1-smooth round head (zero seam!)
+    drawShibaEarStroke(-1, state.leftEarKick);
+    drawShibaEarStroke(1, state.rightEarKick);
+    defineHairTuftPath();
+    ctx.strokeStyle = style.outline;
+    ctx.lineWidth = style.outlineW * 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    defineMochiHeadPath();
+    ctx.strokeStyle = style.outline;
+    ctx.lineWidth = style.outlineW * 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Pass 2: Seamless interior fills
+    drawShibaEarFill(-1, state.leftEarKick);
+    drawShibaEarFill(1, state.rightEarKick);
+    defineHairTuftPath();
+    ctx.fillStyle = '#FBC86B';
+    ctx.fill();
 
     defineMochiHeadPath();
     const headGrad = ctx.createRadialGradient(-24, -52, 16, 0, 0, 134);
@@ -2067,13 +2117,11 @@
 
     ctx.beginPath();
     ctx.moveTo(0, -24);
-    ctx.bezierCurveTo(22, -46, 68, -42, 92, -10);
-    ctx.bezierCurveTo(116, 18, 122, 52, 118, 92);
-    ctx.lineTo(118, 112);
-    ctx.lineTo(-118, 112);
-    ctx.lineTo(-118, 92);
-    ctx.bezierCurveTo(-122, 52, -116, 18, -92, -10);
-    ctx.bezierCurveTo(-68, -42, -22, -46, 0, -24);
+    ctx.bezierCurveTo(22, -46, 72, -42, 116, 10);
+    ctx.lineTo(120, 112);
+    ctx.lineTo(-120, 112);
+    ctx.lineTo(-116, 10);
+    ctx.bezierCurveTo(-72, -42, -22, -46, 0, -24);
     ctx.closePath();
 
     const faceGrad = ctx.createLinearGradient(0, -40, 0, 96);
@@ -2098,24 +2146,6 @@
     ctx.arc(0, -10, 74, -Math.PI * 0.68, -Math.PI * 0.32);
     ctx.stroke();
     ctx.restore();
-
-    defineMochiHeadPath();
-    ctx.strokeStyle = style.outline;
-    ctx.lineWidth = style.outlineW;
-    ctx.lineJoin = 'round';
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(-6, -89);
-    ctx.quadraticCurveTo(-2, -103, 9, -98);
-    ctx.quadraticCurveTo(4, -91, 8, -89);
-    ctx.fillStyle = '#FBC86B';
-    ctx.fill();
-    ctx.strokeStyle = style.outline;
-    ctx.lineWidth = 2.4;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.stroke();
 
     drawShibaFaceFeatures();
     ctx.restore();
