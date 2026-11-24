@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小黄狗键鼠伙伴</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="theme-light char-daisy">
+  <main class="stage-shell">
+    <canvas id="petCanvas" aria-label="可爱的黄身白面小狗键鼠互动画布"></canvas>
+
+    <header class="hud-top">
+      <div class="brand-pill">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span class="brand-title">小黄狗键鼠伙伴</span>
+        <span class="brand-sep">·</span>
+        <span class="brand-hint" id="statusHint">按键或移动 / 点击鼠标开始互动</span>
+      </div>
+
+      <div class="hud-actions">
+        <div class="char-switcher" role="group" aria-label="角色切换">
+          <button type="button" class="char-tab" data-char="shiba" aria-pressed="false" title="切换到红巾软萌柴犬">
+            <span>🐕</span>
+            <span>红巾小柴</span>
+          </button>
+          <button type="button" class="char-tab is-active" data-char="daisy" aria-pressed="true" title="切换到蓝花巾开心柴犬">
+            <span>🌼</span>
+            <span>蓝巾笑柴</span>
+          </button>
+        </div>
+
+        <div class="counter-pill" title="累计互动次数">
+          <span class="counter-icon" aria-hidden="true">🐾</span>
+          <span id="actionCount">0</span>
+        </div>
+
+        <button type="button" class="pill-btn" id="themeToggle" aria-pressed="false" title="切换背景明暗">
+          <span class="btn-icon" id="themeIcon">☀️</span>
+          <span id="themeLabel">浅色</span>
+        </button>
+
+        <button type="button" class="pill-btn" id="soundToggle" aria-pressed="false" title="切换键鼠音效">
+          <span class="btn-icon" id="soundIcon">🔇</span>
+          <span id="soundLabel">音效关</span>
+        </button>
+      </div>
+    </header>
+
+    <footer class="hud-bottom">
+      <div class="legend-pill">
+        <span class="legend-item"><kbd>任意键</kbd> 同步按键并放大渐变消失</span>
+        <span class="legend-divider"></span>
+        <span class="legend-item"><span class="dot-left"></span>左键高亮</span>
+        <span class="legend-item"><span class="dot-right"></span>右键高亮</span>
+        <span class="legend-item"><span class="dot-move"></span>移动同步鼠标</span>
+      </div>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
